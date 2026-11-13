@@ -53,6 +53,7 @@ const foundations: { slug: string; title: string; description: string; body: str
   { slug: 'data-visualisation', title: 'Data visualisation', description: 'How to draw charts in Marmot.', body: sub('Data visualisation') },
   { slug: 'copy', title: 'Copy', description: 'How Marmot writes.', body: take('Copy') },
   { slug: 'accessibility', title: 'Accessibility', description: 'Keyboard, screen readers and how to check.', body: take('Accessibility') },
+  { slug: 'marketing', title: 'Marketing site', description: 'What the public site may add beyond the product rules.', body: take('Marketing site') },
   { slug: 'logo', title: 'Logo', description: 'The wordmark and how to use it.', body: take('Logo') },
   { slug: 'checklist', title: 'Before you ship a screen', description: 'The checks every screen passes.', body: take('Before you ship a screen') },
 ];

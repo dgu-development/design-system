@@ -183,6 +183,19 @@ The components that are easiest to misuse:
 - **Typographic details:** curly quotes, a real ellipsis (…), non-breaking spaces in `10 MB` and `⌘ K`, and numerals for counts.
 - **Sample data** is specific and plausible: `orders_daily`, `customers_dim`, `shop.orders.v2`, `mrn://postgresql/table/shop.public.orders`, row counts like 1,284,019, owners like "Analytics Engineering", people like "Jane Doe". No lorem ipsum or "Acme Corp". Agents and other clients have neutral names ("support-triage-agent", "cli-agent") and the generic agent logo rather than a real vendor's.
 
+## Marketing site
+
+The rest of these guidelines are written for the product, where people work for hours. The public sites (marmotdata.io, the plugin directory and Marmot Cloud's signed-out pages) are scanned once by someone deciding whether to try Marmot, so they may use more depth than a working screen, within these limits. Everything else in these guidelines still applies.
+
+- **Paper grain.** A faint fixed noise over the page, blended with soft light so it adds texture without darkening or lightening either theme.
+- **Contour fields.** More than one per page is fine: behind the hero, inside a product picture's well, on a band. Keep the lines neutral and faint where text sits over them, and let them dissolve towards the words.
+- **Product as pictures.** Show the real elements, laid out at the app's size and scaled to fit, framed by a hairline. A soft shadow only on a small sheet sitting inside a sunken well, never on a full-size screen or on cards.
+- **One dark band.** An ink band, with its contour lines in paper colour, can mark the main call to action between sections. One per page.
+- **Two-tone headlines.** A section headline can carry its answer as a second, quieter sentence in `mm-text-2`.
+- **Burnt sienna as progress.** The line that fills under the current tab or point while a demo plays may be burnt sienna. It is still never a large fill or a status.
+- **Motion that tells the story.** Demos may play and move on by themselves while they are on screen: tabs or points take turns, with a line filling as each plays. Choosing one stops the auto-advance, and under reduced motion nothing advances by itself.
+- **Still not allowed:** gradients and colour washes, glass, glows, heavy shadows on large surfaces, logo walls, 01, 02, 03 numbering on things that are not steps, code snippets, and copy that states the obvious.
+
 ## Logo
 
 The logo is the Marmot wordmark only (`mm-logo`, with an "M" monogram in the collapsed sidebar). There is no mascot or pictorial mark anywhere: it reads as more professional. The wordmark is fixed artwork in ink or paper: use it as supplied, without redrawing, re-typesetting or a gradient tile. Empty states use the contour motif as a faint background field instead of an illustration.
