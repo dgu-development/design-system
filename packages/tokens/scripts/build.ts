@@ -207,8 +207,10 @@ writeFileSync(join(outDir, 'tailwind-preset.cjs'), twV3);
 for (const f of tokens.type.fonts) copyFileSync(join(sourceDir, 'fonts', basename(f.file)), join(outDir, 'fonts', basename(f.file)));
 // The SIL Open Font License must travel with the font files.
 for (const f of readdirSync(join(sourceDir, 'fonts')).filter((n) => n.endsWith('.txt'))) copyFileSync(join(sourceDir, 'fonts', f), join(outDir, 'fonts', f));
-for (const f of ['marmot-wordmark.svg', 'marmot-wordmark-light.svg']) {
+for (const f of ['marmot-wordmark.svg', 'marmot-wordmark-light.svg', 'marmot-monogram.svg', 'marmot-monogram-light.svg']) {
   mkdirSync(join(outDir, 'logos'), { recursive: true });
   copyFileSync(join(sourceDir, 'logos', f), join(outDir, 'logos', f));
 }
+mkdirSync(join(outDir, 'favicon'), { recursive: true });
+for (const f of readdirSync(join(sourceDir, 'favicon'))) copyFileSync(join(sourceDir, 'favicon', f), join(outDir, 'favicon', f));
 console.log(`tokens: ${colorNames.length} colours, ${typeStyles.length} type styles, ${Object.keys(motion).length} motion values`);

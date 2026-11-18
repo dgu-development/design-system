@@ -20,7 +20,8 @@ const storybook = process.env.STORYBOOK_URL ?? 'pathname:///storybook';
 /* ------------------------------------------------------------------ wordmark */
 
 mkdirSync(join(here, 'static/img'), { recursive: true });
-for (const f of ['marmot-wordmark.svg', 'marmot-wordmark-light.svg']) copyFileSync(join(repo, 'packages/tokens/dist/logos', f), join(here, 'static/img', f));
+for (const f of ['marmot-wordmark.svg', 'marmot-wordmark-light.svg', 'marmot-monogram.svg', 'marmot-monogram-light.svg']) copyFileSync(join(repo, 'packages/tokens/dist/logos', f), join(here, 'static/img', f));
+for (const f of ['favicon.svg', 'favicon.ico', 'apple-touch-icon.png']) copyFileSync(join(repo, 'packages/tokens/dist/favicon', f), join(here, 'static/img', f));
 
 /* ------------------------------------------------------------------ foundations */
 

@@ -5,3 +5,6 @@ docs/foundations
 docs/components
 docs/components-overview.mdx
 static/img/marmot-wordmark*.svg
+static/img/marmot-monogram*.svg
+static/img/favicon.*
+static/img/apple-touch-icon.png

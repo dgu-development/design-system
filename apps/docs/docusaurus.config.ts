@@ -10,7 +10,11 @@ const config: Config = {
   tagline: 'Tokens, components and guidelines for building Marmot.',
   url: 'https://design.marmotdata.io',
   baseUrl: '/',
-  favicon: 'img/marmot-wordmark.svg',
+  favicon: 'img/favicon.svg',
+  headTags: [
+    { tagName: 'link', attributes: { rel: 'icon', href: '/img/favicon.ico', sizes: '32x32' } },
+    { tagName: 'link', attributes: { rel: 'apple-touch-icon', href: '/img/apple-touch-icon.png' } },
+  ],
   onBrokenLinks: 'throw',
   // .md files are plain CommonMark (the generated guidelines); .mdx files can use components.
   markdown: { format: 'detect', hooks: { onBrokenMarkdownLinks: 'throw' } },
