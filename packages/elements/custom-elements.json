@@ -25829,6 +25829,50 @@
             },
             {
               "kind": "method",
+              "name": "traceColumns",
+              "return": {
+                "type": {
+                  "text": "boolean"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "source",
+                  "type": {
+                    "text": "string"
+                  }
+                },
+                {
+                  "name": "target",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "Traces the columns of the edge from `source` to `target`, as clicking it does, so a host can show a job's column lineage when the job itself is chosen. Returns false when there is no such edge or it carries no column mappings. The edge must be in `graph`; a host that keeps such edges out of the drawing adds it before calling this."
+            },
+            {
+              "kind": "field",
+              "name": "#traceJob",
+              "privacy": "private",
+              "type": {
+                "text": "string"
+              },
+              "description": "The job that moved the traced columns, when the traced edge names one and the job is drawn.",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "clearColumnTrace",
+              "return": {
+                "type": {
+                  "text": "void"
+                }
+              },
+              "description": "Ends a column trace, if one is showing."
+            },
+            {
+              "kind": "method",
               "name": "fit",
               "return": {
                 "type": {

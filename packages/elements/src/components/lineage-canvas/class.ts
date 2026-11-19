@@ -456,6 +456,15 @@ export class MmLineageCanvas extends LitElement {
       .e.dim {
         opacity: 0.3;
       }
+      .trace-job {
+        color: var(--mm-text-2);
+        font-size: 13px;
+        max-width: 28ch;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        align-self: center;
+      }
       .trace.focused .cl:not(.off) {
         stroke: var(--mm-text);
         stroke-width: 2.5;
@@ -708,6 +717,9 @@ export class MmLineageCanvas extends LitElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     this.removeEventListener('keydown', this.#onHostKeydown);
+    window.removeEventListener('pointerup', this.#onNodeUp, true);
+    window.removeEventListener('pointercancel', this.#onNodeUp, true);
+    this.#drag = null;
     this.#resize?.disconnect();
     cancelAnimationFrame(this.#frame);
   }
@@ -1055,11 +1067,19 @@ export class MmLineageCanvas extends LitElement {
     const p = this.#layout?.nodes[id];
     if (!p) return;
     this.#drag = { id, pointer: e.pointerId, sx: e.clientX, sy: e.clientY, nx: p[0], ny: p[1], moved: false };
+    // The pointer can come up away from the node, such as after a fast drag or when the layout moves the node out from under it, so the drag ends wherever it is released.
+    window.addEventListener('pointerup', this.#onNodeUp, true);
+    window.addEventListener('pointercancel', this.#onNodeUp, true);
   };
 
   #onNodeMove = (e: PointerEvent) => {
     const d = this.#drag;
     if (!d || e.pointerId !== d.pointer) return;
+    // A move with no button held means the release was missed; a node only follows the pointer while it is pressed.
+    if ((e.buttons & 1) === 0) {
+      this.#onNodeUp(e);
+      return;
+    }
     const dx = e.clientX - d.sx;
     const dy = e.clientY - d.sy;
     if (!d.moved) {
@@ -1081,12 +1101,36 @@ export class MmLineageCanvas extends LitElement {
     const d = this.#drag;
     if (!d || e.pointerId !== d.pointer) return;
     this.#drag = null;
+    window.removeEventListener('pointerup', this.#onNodeUp, true);
+    window.removeEventListener('pointercancel', this.#onNodeUp, true);
     if (!d.moved) return;
     this.#userMoved = true;
     this.#dragged = true;
     this.toggleAttribute('data-dragging', false);
     this.#emitMove(d.id);
   };
+
+  /**
+   * Traces the columns of the edge from `source` to `target`, as clicking it does, so a host can show a job's column lineage when the job itself is chosen. Returns false when there is no such edge or it carries no column mappings. The edge must be in `graph`; a host that keeps such edges out of the drawing adds it before calling this.
+   */
+  traceColumns(source: string, target: string): boolean {
+    const edge = [...this.#edgeById.values()].find((e) => e.source === source && e.target === target);
+    if (!edge?.columns?.length) return false;
+    if (this.#traceEdge === edge.id) return true;
+    this.#activateEdge(edge);
+    return true;
+  }
+
+  /** The job that moved the traced columns, when the traced edge names one and the job is drawn. */
+  get #traceJob(): string {
+    const job = this.#traceEdge ? this.#edgeById.get(this.#traceEdge)?.job : undefined;
+    return job && this.#byId.has(job) ? job : '';
+  }
+
+  /** Ends a column trace, if one is showing. */
+  clearColumnTrace(): void {
+    this.#clearTrace();
+  }
 
   /** Fits the whole graph in view, clear of the legend, zoom controls and minimap. */
   fit(): void {
@@ -1623,7 +1667,9 @@ export class MmLineageCanvas extends LitElement {
       return;
     }
     for (const t of e.composedPath()) {
-      if (!(t instanceof Element) || t === this.#layer) break;
+      if (t === this.#layer) break;
+      // A node renders in its own shadow root, so a click on its text passes that root on the way up to the element carrying data-node.
+      if (!(t instanceof Element)) continue;
       const ds = (t as HTMLElement | SVGElement).dataset;
       if (ds.col) {
         const host = e.composedPath().find((x): x is HTMLElement => x instanceof HTMLElement && !!x.dataset?.node);
@@ -1667,7 +1713,8 @@ export class MmLineageCanvas extends LitElement {
       let col = '';
       let node = '';
       for (const t of e.composedPath()) {
-        if (!(t instanceof Element) || t === this.#layer) break;
+        if (t === this.#layer) break;
+        if (!(t instanceof Element)) continue;
         const ds = (t as HTMLElement).dataset;
         if (ds?.col && !col) col = ds.col;
         if (ds?.node && t.classList.contains('n')) node = ds.node;
@@ -1680,7 +1727,8 @@ export class MmLineageCanvas extends LitElement {
     }
     let id = '';
     for (const t of e.composedPath()) {
-      if (!(t instanceof Element) || t === this.#layer) break;
+      if (t === this.#layer) break;
+      if (!(t instanceof Element)) continue;
       const v = (t as HTMLElement | SVGElement).dataset.edge;
       if (v) {
         id = v;
@@ -1868,7 +1916,8 @@ export class MmLineageCanvas extends LitElement {
           </button>`
         : nothing;
     const tracing = !!this.#traceEdge;
-    const traced = tracing && !!n.columns?.length;
+    // The job that moved the traced columns stays at full strength, so the trace reads as what that job did.
+    const traced = tracing && (!!n.columns?.length || n.id === this.#traceJob);
     const a = this.#activeCol;
     const te = traced ? this.#edgeById.get(this.#traceEdge) : undefined;
     let active: string[] = [];
@@ -1935,7 +1984,8 @@ export class MmLineageCanvas extends LitElement {
         <path class="hit" d=${g.d}><title>${this.#chipText(e)}</title></path>
       </g>`;
     }
-    const fade = this.#traceEdge ? 'dim' : '';
+    const job = this.#traceJob;
+    const fade = this.#traceEdge && !(job && (e.source === job || e.target === job)) ? 'dim' : '';
     return svg`<g class="e ${e.origin} ${hot ? 'hot' : ''} ${fade}" id="e${i}" data-edge=${e.id} role="group" aria-roledescription=${tr('lineageEdgeRole', 'edge')} aria-label=${this.#edgeLabel(e)}>
       ${focused ? svg`<path class="ring" d=${g.d}></path><path class="gap" d=${g.d}></path>` : nothing}
       <path class="hit" d=${g.d}><title>${e.job || this.#chipText(e)}</title></path>
@@ -2109,9 +2159,17 @@ export class MmLineageCanvas extends LitElement {
       }
       ${
         this.#trace
-          ? html`<mm-button variant="ghost" size="sm" icon="close" @click=${() => this.#clearTrace()}
-              >${tr('lineageHideColumns', 'Hide columns')}</mm-button
-            >`
+          ? html`${
+                this.#traceJob
+                  ? html`<span class="trace-job"
+                      >${tr('lineageColumnsVia', 'Columns via {job}', {
+                        job: this.#byId.get(this.#traceJob)?.name ?? this.#traceJob,
+                      })}</span
+                    >`
+                  : nothing
+              }<mm-button variant="ghost" size="sm" icon="close" @click=${() => this.#clearTrace()}
+                >${tr('lineageHideColumns', 'Hide columns')}</mm-button
+              >`
           : nothing
       }
       <span class="spacer"></span>

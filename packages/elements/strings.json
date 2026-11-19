@@ -212,6 +212,7 @@
   "lineageColumnsHint": "{n} column mappings, press Enter to show them",
   "lineageColumnsList": "columns {list}",
   "lineageColumnsTraced": "Showing {n} columns from {source} to {target}",
+  "lineageColumnsVia": "Columns via {job}",
   "lineageControls": "Lineage controls",
   "lineageCurrent": "current asset",
   "lineageCycle": "cycle",
